@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.qnareply">
+
+	<insert id="insert">
+		INSERT INTO tbl_qnareply
+		(rno, bno, id, pw, reply)
+		VALUES
+		(seq_reply_rno.NEXTVAL, #{bno}, #{id}, #{pw}, #{reply})
+	</insert>
+	
+	<select id="list" resultType="QnaReplyDTO">
+		SELECT 
+		rno, bno, id, reply, 
+		TO_CHAR(updatedate, 'yyyy-mm-dd') updatedate
+		FROM tbl_qnareply
+		WHERE bno = #{bno}
+		ORDER BY rno ASC
+	</select>
+	
+	<update id="update">
+		UPDATE tbl_qnareply
+		SET
+		reply = #{reply}, updatedate = SYSDATE
+		WHERE rno = #{rno} AND pw = #{pw} 
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM tbl_qnareply
+		WHERE
+		rno = #{rno} AND pw = #{pw}
+	</delete>
+	
+	<select id="getAmount" resultType="Integer">
+		SELECT COUNT(rno) FROM tbl_qnareply
+		WHERE bno = #{bno}
+	</select>
+
+</mapper>

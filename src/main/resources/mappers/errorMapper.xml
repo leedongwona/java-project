@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.error">
+	
+	<insert id="insert">
+		INSERT INTO tbl_error (eno, msg, errordate, updatedate)
+		VALUES
+		(seq_error_eno.NEXTVAL, #{msg}, SYSDATE, SYSDATE)
+	</insert>
+	
+	<select id="list" resultType="ErrorDTO">
+		SELECT eno, status, errordate FROM tbl_error
+	</select>
+	
+	<select id="list_error" resultType="ErrorDTO">
+		SELECT eno, status, errordate FROM tbl_error
+		WHERE status = 'ERROR'
+	</select>
+	
+	<select id="list_fixing" resultType="ErrorDTO">
+		SELECT eno, status, errordate FROM tbl_error
+		WHERE status = 'FIXING'
+	</select>
+	
+	<select id="list_complete" resultType="ErrorDTO">
+		SELECT eno, status, errordate FROM tbl_error
+		WHERE status = 'COMPLETE'
+	</select>
+	
+	<select id="read" resultType="ErrorDTO">
+		SELECT eno, msg, staff, status, TO_CHAR(errordate, 'YYYY-MM-DD HH24:MI:SS') errordate, TO_CHAR(updatedate, 'YYYY-MM-DD HH24:MI:SS') updatedate
+		FROM tbl_error
+		WHERE eno=#{eno}
+	</select>
+	
+	<update id="update">
+		UPDATE tbl_error SET staff=#{staff}, status=#{status}, updatedate=SYSDATE
+		WHERE eno=#{eno}
+	</update>
+	
+</mapper>

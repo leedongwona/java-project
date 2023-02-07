@@ -1,0 +1,162 @@
+CREATE TABLE tbl_member(
+id VARCHAR2(15),
+name VARCHAR2(15) NOT NULL,
+birth DATE NOT NULL,
+address VARCHAR2(300) NOT NULL,
+pw VARCHAR2(300) NOT NULL,
+email VARCHAR2(300),
+grade CHAR(1) DEFAULT 'A',
+CONSTRAINT pk_member_id PRIMARY KEY(id)
+)
+
+UPDATE tbl_member SET grade ='B' WHERE id = 'a001'
+
+CREATE TABLE tbl_shop(
+sNum NUMBER,
+sName VARCHAR2(500) NOT NULL,
+sId VARCHAR2(30) NOT NULL,
+sPrice VARCHAR2(300) NOT NULL,
+sCounts NUMBER,
+sOrigin VARCHAR2(30) NOT NULL,
+sDeliverpri VARCHAR2(30) NOT NULL,
+sDeliverin VARCHAR2(30) NOT NULL,
+sContent VARCHAR2(3000) NOT NULL,
+CONSTRAINT pk_board_mId PRIMARY KEY(snum),
+CONSTRAINT fk_board_mId FOREIGN KEY(sid) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+CREATE TABLE tbl_qna(
+bno NUMBER,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw VARCHAR2(60) NOT NULL,
+id VARCHAR2(6),
+readcnt NUMBER DEFAULT 0,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_qna_bno PRIMARY KEY(bno),
+CONSTRAINT fk_qna_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+CREATE TABLE tbl_board(
+bno NUMBER,
+title VARCHAR2(45) NOT NULL,
+content VARCHAR2(3000) NOT NULL,
+pw VARCHAR2(60) NOT NULL,
+id VARCHAR2(6),
+readcnt NUMBER DEFAULT 0,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_board_bno PRIMARY KEY(bno),
+CONSTRAINT fk_board_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+SELECT MAX(bno) FROM tbl_board
+
+SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_board
+
+
+CREATE TABLE tbl_reply(
+rno NUMBER,
+bno NUMBER,
+id VARCHAR2(6),
+pw VARCHAR2(60) NOT NULL,
+reply VARCHAR2(1000) NOT NULL,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_reply_rno PRIMARY KEY(rno),
+CONSTRAINT fk_reply_bno FOREIGN KEY(bno) REFERENCES tbl_board(bno) 
+ON DELETE CASCADE,
+CONSTRAINT fk_reply_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+
+CREATE TABLE tbl_qnareply(
+rno NUMBER,
+bno NUMBER,
+id VARCHAR2(6),
+pw VARCHAR2(60) NOT NULL,
+reply VARCHAR2(1000) NOT NULL,
+regdate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_qnareply_rno PRIMARY KEY(rno),
+CONSTRAINT fk_qnareply_bno FOREIGN KEY(bno) REFERENCES tbl_qna(bno) 
+ON DELETE CASCADE,
+CONSTRAINT fk_qnareply_id FOREIGN KEY(id) REFERENCES tbl_member(id)
+ON DELETE CASCADE
+)
+
+
+CREATE TABLE tbl_attach(
+id NUMBER,
+bno NUMBER,
+uploadedFilename VARCHAR2(300) NOT NULL,
+regdate DATE DEFAULT SYSDATE,
+CONSTRAINT fk_attach_bno FOREIGN KEY(bno) REFERENCES tbl_board(bno) ON DELETE CASCADE,
+CONSTRAINT pk_attach_id PRIMARY KEY(id)
+)
+
+CREATE TABLE tbl_error(
+eno NUMBER,
+msg VARCHAR2(3000),
+staff VARCHAR2(50) DEFAULT 'STAFF',
+status VARCHAR2(50) DEFAULT 'ERROR',
+errordate DATE DEFAULT SYSDATE,
+updatedate DATE DEFAULT SYSDATE,
+CONSTRAINT pk_error_id PRIMARY KEY(eno)
+)
+
+
+CREATE TABLE tbl_delete_member(
+id VARCHAR2(15),
+name VARCHAR2(15),
+deletedate DATE
+)
+
+
+CREATE or REPLACE TRIGGER tr_delete 
+AFTER DELETE
+ON tbl_member
+FOR EACH ROW
+BEGIN
+INSERT INTO tbl_delete_member
+VALUES (:old.id, :old.name, SYSDATE);
+END;
+/
+
+
+DROP SEQUENCE seq_error_eno
+DROP SEQUENCE seq_reply_rno
+DROP SEQUENCE seq_attach_id
+
+
+CREATE SEQUENCE seq_error_eno
+CREATE SEQUENCE seq_reply_rno
+CREATE SEQUENCE seq_attach_id
+
+
+DROP TABLE tbl_attach
+DROP TABLE tbl_reply
+DROP TABLE tbl_board
+DROP TABLE tbl_qna
+DROP TABLE tbl_qnareply
+DROP TABLE tbl_member
+DROP TABLE tbl_error
+
+
+ALTER TABLE tbl_board DROP PRIMARY KEY CASCADE;
+ALTER TABLE tbl_member DROP PRIMARY KEY CASCADE;
+ALTER TABLE tbl_qna DROP PRIMARY KEY CASCADE;
+
+SELECT * FROM tbl_attach
+SELECT * FROM tbl_reply
+SELECT * FROM tbl_board
+SELECT * FROM tbl_qna
+SELECT * FROM tbl_qnareply
+SELECT * FROM tbl_member
+SELECT * FROM tbl_error
+SELECT * FROM tbl_delete_member WHERE name = '김철수'

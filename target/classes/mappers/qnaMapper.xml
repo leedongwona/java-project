@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.qna">
+      
+	<insert id="insert">
+		INSERT INTO tbl_qna (bno, pw, title, content, id)
+		VALUES
+		((SELECT NVL2(MAX(bno), MAX(bno)+1, 1) FROM tbl_qna),
+		#{pw}, #{title}, #{content}, #{id})
+		
+		<selectKey order="AFTER" keyProperty="bno" resultType="Integer">
+			SELECT MAX(bno) FROM tbl_qna
+		</selectKey>
+	</insert>
+	
+	<select id="list" resultType="QnaDTO">
+		SELECT bno, title, id, readcnt, 
+		TO_CHAR(regdate, 'yyyy-mm-dd') regdate 
+		FROM tbl_qna
+		ORDER BY bno DESC
+	</select>
+	
+	<sql id="searchTag">
+		<if test="criteria != null">
+			<if test="criteria == 'id'.toString()">
+				WHERE UPPER(id) LIKE UPPER('%'||#{keyword}||'%')
+			</if>
+		
+			<if test="criteria == 'title'.toString()">
+				WHERE UPPER(title) LIKE UPPER('%'||#{keyword}||'%')
+			</if>
+			
+			<if test="criteria == 'content'.toString()">
+				WHERE UPPER(content) LIKE UPPER('%'||#{keyword}||'%')
+			</if>
+		</if>
+	</sql>
+	
+	<select id="list2" resultType="QnaDTO">
+		SELECT bno, title, id, readcnt, 
+		TO_CHAR(regdate, 'yyyy-mm-dd') regdate 
+		FROM tbl_qna
+			<include refid="searchTag"></include>
+			ORDER BY bno DESC
+	</select>
+	
+	<select id="getAmount" resultType="Integer">
+		SELECT COUNT(bno) FROM tbl_qna
+			<include refid="searchTag"></include>
+	</select>
+	
+	<select id="read" resultType="QnaDTO">
+		SELECT bno, title, content, id, readcnt, TO_CHAR(regdate, 'yyyy-mm-dd') regdate, 
+		TO_CHAR(updatedate, 'yyyy-mm-dd') updatedate FROM tbl_qna
+		WHERE bno = #{bno}
+	</select>
+	
+	<update id="increaseReadcnt">
+		UPDATE tbl_qna SET readcnt = readcnt + 1 
+		WHERE bno = #{bno}
+	</update>
+	
+	<update id="update">
+		UPDATE tbl_qna
+		SET title = #{title}, content=#{content}, updatedate = SYSDATE 
+		WHERE bno = #{bno} AND pw =#{pw}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM tbl_qna
+		WHERE bno = #{bno} AND pw = #{pw}
+	
+	</delete>
+	
+</mapper>

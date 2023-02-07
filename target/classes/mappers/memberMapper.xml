@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.member">
+	
+	<insert id="insert">
+		INSERT INTO tbl_member (id, pw, name, birth, address, email)
+		VALUES
+		(#{id}, #{pw}, #{name}, #{birth}, #{address}, #{email})
+	</insert>
+	
+	<select id="read" resultType="MemberDTO">
+		SELECT id, pw, name, TO_CHAR(birth, 'yyyy-mm-dd') birth, FLOOR(MONTHS_BETWEEN(SYSDATE, birth)/12) AS age, address, email, grade
+		FROM tbl_member
+		WHERE id = #{id}
+	</select>
+	
+	<update id="update">
+		UPDATE tbl_member SET name=#{name},
+		birth = #{birth}, email =#{email},
+		address = #{address}
+		WHERE id=#{id} AND pw=#{pw} AND pw2=#{pw2}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM tbl_member
+		WHERE id = #{id} AND pw = #{pw}
+	</delete>
+	
+	<update id="changePw">
+		UPDATE tbl_member SET pw=#{npw}
+		WHERE id=#{id} AND pw=#{pw}
+	</update>
+	
+	<select id="login" resultType="MemberDTO">
+		SELECT id, name, grade FROM tbl_member WHERE id=#{id} AND pw=#{pw}
+	</select>
+		
+</mapper>
